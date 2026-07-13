@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 // matches each component to a pin
 
 // Player 1 Buttons
@@ -36,8 +38,50 @@ String words[] = {
   "WATER",
   "TRAIN",
   "CLOUD",
-  "BRICK"
+  "BRICK",
+  "DREAM",
+  "EARTH",
+  "FLAME",
+  "GRAPE",
+  "MOUSE",
+  "NIGHT",
+  "OCEAN",
+  "QUEEN",
+  "UNITY",
+  "VIRUS",
+  "YOUNG",
+  "ZEBRA",
+  "QUICK",
+  "JUMPY",
+  "FROST",
+  "BLAZE",
+  "PIXEL",
+  "GIANT",
+  "HAPPY",
+  "SNAKE",
+  "TIGER",
+  "WHALE",
+  "CANDY",
+  "FUZZY",
+  "JELLY",
+  "KOALA",
+  "XENON",
+  "BEACH",
+  "CHESS",
+  "FIELD",
+  "GRASS",
+  "HEART",
+  "INDEX",
+  "LEMON",
+  "MAGIC",
+  "NORTH",
+  "PIZZA",
+  "RIVER",
+  "SHEEP",
+  "ZONES"
 };
+
+int wordNum = sizeof(words) / sizeof(words[0]);
 
 
 String morseInput;
@@ -96,7 +140,7 @@ const unsigned long debounceDelay = 200;
 
 void setup() {
 
-  // //starts Serial Monitor
+  //starts Serial Monitor
   // Serial.begin(9600);
 
   //sets up pin modes as inputs or outputs for buttons, LEDs, buzzer
@@ -123,13 +167,19 @@ void setup() {
   }
 
 
-  //pick a random word and print --- MAY CHANGE LATER 
-  randomSeed(analogRead(A0));
+  //pick a random word using a seed that changes each startup
+  int seed;
 
-  int randomIndex = random(0,10);
+  EEPROM.get(0, seed);
+  seed++;
+  EEPROM.put(0, seed);
+
+  randomSeed(seed);
+
+  int randomIndex = random(0, wordNum);
   targetWord = words[randomIndex];
 
-  Serial.println(targetWord);
+  // Serial.println(targetWord);
 }
 
 
@@ -161,7 +211,7 @@ void readButtons(int dotPin, int dashPin, int submitPin){
   if(lastDotState == HIGH && dotState == LOW){
     if(currentTime - lastDotTime > debounceDelay){
       morseInput += ".";
-      Serial.println(morseInput);
+      // Serial.println(morseInput);
       lastDotTime = currentTime;
 
     }
@@ -172,7 +222,7 @@ void readButtons(int dotPin, int dashPin, int submitPin){
   if(lastDashState == HIGH && dashState == LOW){
     if(currentTime - lastDashTime > debounceDelay){
       morseInput += "-";
-      Serial.println(morseInput);
+      // Serial.println(morseInput);
       lastDashTime = currentTime;
     }
 
@@ -183,7 +233,7 @@ void readButtons(int dotPin, int dashPin, int submitPin){
     if(currentTime - lastSubmitTime > debounceDelay){
       checkLetter();
       morseInput = "";      
-      Serial.println("Reset");
+      // Serial.println("Reset");
       lastSubmitTime = currentTime;
     }
 
@@ -201,15 +251,14 @@ void checkLetter(){
   char decoded = decodeMorse(morseInput);
 
 
-  Serial.print("Entered: ");
-  Serial.println(decoded);
+  // Serial.print("Entered: ");
+  // Serial.println(decoded);
 
 
 
   // Correct letter
 
   if(decoded == targetWord[currentLetter]){
-
 
     digitalWrite(greenLEDs[currentLetter], HIGH);
 
@@ -241,7 +290,6 @@ void checkLetter(){
     flashRed();
     switchPlayer();
   }
-
 
 }
 
@@ -281,11 +329,11 @@ void switchPlayer(){
   }
 
 
-  Serial.print("Player ");
+  // Serial.print("Player ");
 
-  Serial.print(currentPlayer);
+  // Serial.print(currentPlayer);
 
-  Serial.println("'s turn");
+  // Serial.println("'s turn");
 
 }
 
@@ -333,14 +381,14 @@ void startRound(){
 
   // Choose random word
 
-  int randomIndex = random(0,10);
+  int randomIndex = random(0, wordNum);
 
   targetWord = words[randomIndex];
 
 
-  Serial.print("New Word: ");
+  // Serial.print("New Word: ");
 
-  Serial.println(targetWord);
+  // Serial.println(targetWord);
 
 
 
@@ -363,9 +411,9 @@ void givePoint(){
     player1Score++;
 
 
-    Serial.print("Player 1 Score: ");
+    // Serial.print("Player 1 Score: ");
 
-    Serial.println(player1Score);
+    // Serial.println(player1Score);
 
 
   }
@@ -379,9 +427,9 @@ void givePoint(){
     player2Score++;
 
 
-    Serial.print("Player 2 Score: ");
+    // Serial.print("Player 2 Score: ");
 
-    Serial.println(player2Score);
+    // Serial.println(player2Score);
 
 
   }
@@ -391,7 +439,7 @@ void givePoint(){
 void winRound(){
 
 
-  Serial.println("ROUND WON!");
+  // Serial.println("ROUND WON!");
 
 
 
@@ -439,7 +487,7 @@ void winRound(){
 void winGame(){
 
 
-  Serial.println("GAME OVER!");
+  // Serial.println("GAME OVER!");
 
 
 
@@ -514,5 +562,7 @@ else if(player2Score == 3){
 
   }
 
+
+}
 
 }
