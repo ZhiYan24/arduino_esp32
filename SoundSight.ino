@@ -32,8 +32,9 @@ struct {
 
 
 bool alerts[3] = {false, false, false};
-const float CONFIDENCE_THRESHOLD = 0.8;
-const float GLASS_THRESHOLD      = 0.65;
+const float BABY_THRESHOLD = 0.95;
+const float GLASS_THRESHOLD = 1.0;
+const float SMOKE_THRESHOLD = 0.25;
 
 uint32_t alarmColors[3];
 
@@ -424,7 +425,7 @@ void classifySound() {
    bool anyNewAlert = false;
 
 
-   if (smoke > CONFIDENCE_THRESHOLD) {
+   if (smoke > SMOKE_THRESHOLD) {
        if (!alerts[0]) anyNewAlert = true;
        alerts[0] = true;
        state.alarmActive = true;
@@ -444,7 +445,7 @@ void classifySound() {
    }
 
 
-   if (baby > CONFIDENCE_THRESHOLD) {
+   if (baby > BABY_THRESHOLD) {
        if (!alerts[2]) anyNewAlert = true;
        alerts[2] = true;
        state.alarmActive = true;
@@ -581,8 +582,6 @@ static void capture_samples(void* arg) {
            if (bytes_read < i2s_bytes_to_read) ei_printf("Partial I2S read");
            for (int x = 0; x < i2s_bytes_to_read/2; x++) {
                int32_t scaled = (int32_t)sampleBuffer[x] * 8;
-               if (scaled > 32767) scaled = 32767;
-               if (scaled < -32768) scaled = -32768;
                sampleBuffer[x] = (int16_t)scaled;
            }
            if (record_status) audio_inference_callback(i2s_bytes_to_read);
